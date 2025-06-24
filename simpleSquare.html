@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<!-- 
+SimpleSquare Demo
+This is a simple html document with a vertex shader and a fragment shader 
+
+This program uses simpleSquare.js and MV.js in the Common folder.
+
+-->
+<!-- This is how you make a comment in HTML  -->
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+
+<!-- Create a title in the browser Tab  -->
+<title>Simple Square</title>
+
+<!-- A webGL program MUST have a vertex shader and a fragment shader -->
+
+<!-- Vertex shader written in GLSL. -->
+<!-- Notice the script tag -->
+<!-- This is a "pass through" vertex shader  -->
+<!-- Just passing the vertex to the fragment shader without calculations  -->
+   
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+// The vertex shader is called for each vertex in the vertex buffer 
+// The square vertices were sent to the GPU in the JS/webGL code
+// The square vertices are 2D coordinates (x, y)
+// check the line in the JS file with "vertexAttribPointer"
+
+attribute vec4 vPosition; // Vertex position attribute
+uniform float theta;   // Rotation angle (in radians)
+attribute vec3 vColor; // Vertex color attribute
+
+varying vec3 fColor; // Fragment color (passed to the fragment shader)
+uniform vec2 offset; // Translation offset
+
+void main() {
+    // Rotation matrix components
+    float s = sin(theta);
+    float c = cos(theta);
+
+    // Scale factor
+    float scale = 0.25;
+
+    // Apply scaling, rotation, and translation
+    gl_Position.x = scale * (c * vPosition.x - s * vPosition.y) - offset.x;
+    gl_Position.y = scale * (s * vPosition.x + c * vPosition.y) - offset.y;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+
+    // Modify color based on clip coordinates
+    float red   = vColor.r * (1.0 - abs(gl_Position.x));  // More red at x=0
+    float blue  = vColor.b * (1.0 - abs(gl_Position.y));  // More blue at y=0
+    float green = vColor.g;  // Keep green the same
+
+    fColor = vec3(red, green, blue); // Set the fragment color to the modified color
+}
+
+</script>
+
+
+<!-- Fragment shader written in GLSL  -->
+<!-- It is setting the color of the square  -->
+<!-- color defined by (Red, Green, Blue, 1.0)  -->
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+// must set precision
+precision mediump float;
+varying vec3 fColor;
+void main()
+{
+	// This is a comment in GLSL
+	// Set the color (Red, Green, Blue, Alpha) All values between [0,1]
+	// This fragment color variable is built-in variable
+	// A fragment is a potential pixel (x,y, z depth) and color
+	// potiential = it might get overwritten
+    //gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	gl_FragColor = vec4(fColor, 1.0);
+}
+</script>
+
+<!-- Here are the js files used by this program  -->
+<!-- If the Common folder not in correct place, nothing will display  --> 
+<!-- The first three files are libraries and the last one is our program -->
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="simpleSquare.js"></script>
+
+
+
+<!-- Inline CSS code to make the text prettier -->
+<style>
+body
+{
+    font-style: normal;
+    font-family: sans-serif;
+    color: #222;
+    padding: 0 1em;
+    line-height: 1.25em;
+}
+</style>
+</head>   
+
+<!-- Here is some text for the html document  -->
+<!-- Good practice: describe what the program does and any user interaction available -->
+<!-- The text can go anywhere on the page  -->
+
+<body>
+<h1> HW1 Kaleidoscope </h1>
+<h2> Lorenzo Barela</h2>
+<p>
+
+</p>
+
+
+
+
+
+
+<!-- Create the window for displaying the simple square with HTML5 canvas element  -->
+<!-- Specify the size in pixels -->
+<!-- A border helps when getting started learning computer graphics -->
+
+ <canvas id="gl-canvas" width="500" height="500" style="border:2px solid #000000;"> 
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+<!-- The canvas context is an object with properties and methods that you can use to render graphics inside the canvas element. The context can be 2d or webgl (3d).
+-->
+
+<p>This program visualizes a shape defined by vertices, rendering it as a collection of triangles.  The central shape rotates clockwise, with instanced copies spinning counter-clockwise, creating a dynamic visual effect.</p>
+
+
+</body>
+</html>
